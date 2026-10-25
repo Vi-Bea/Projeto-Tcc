@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>O’Belisco · Sistema de Pedidos</title>
+<style>
+:root{--bgL:#e9e9ec;--ink:#111;--or:#ee5a00;--orS:#fff1e8;--ln:#e5e5e8;--mut:#6b6b70;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bgL:#1c1c1f}}
+:root[data-theme="dark"]{--bgL:#1c1c1f}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:#050505;color:#fff;font-family:system-ui,"Segoe UI",Roboto,sans-serif}
+button{font:inherit;color:inherit}
+.split{display:grid;grid-template-columns:1fr 1fr;height:100%}
+.L{background:var(--bgL);display:flex;align-items:center;justify-content:center;padding:12px;min-width:0}
+.R{container-type:inline-size;display:flex;flex-direction:column;gap:8px;padding:12px;min-width:0;min-height:0}
+@media(max-width:900px){.split{grid-template-columns:1fr;height:auto}.L{height:800px}.R{min-height:940px}}
+.phone{height:min(780px,100%);max-width:100%;aspect-ratio:9/18.6;background:#0b0b0c;border-radius:44px;padding:10px;box-shadow:0 20px 50px #0005}
+.scr{position:relative;height:100%;background:#fafafa;color:var(--ink);border-radius:34px;overflow:hidden}
+.notch{position:absolute;top:9px;left:50%;transform:translateX(-50%);width:92px;height:24px;background:#000;border-radius:14px;z-index:3}
+#app{display:flex;flex-direction:column;height:100%}
+.sb{display:flex;justify-content:space-between;padding:12px 24px 0;font-size:12px;font-weight:700;height:38px}
+.top{display:flex;align-items:center;justify-content:space-between;padding:8px 16px}
+.top h1{font-size:20px;margin:0}
+.top>span:first-child{color:var(--or);font-size:22px}
+.bell{position:relative;font-size:19px}.bell i{display:none;position:absolute;top:-1px;right:-2px;width:9px;height:9px;border-radius:50%;background:var(--or)}
+.hot .bell i{display:block}
+.body{flex:1;min-height:0;overflow:auto;padding:0 14px 10px}
+h2{font-size:15px;margin:14px 0 8px}
+.mut,small{color:var(--mut)}
+.grow{flex:1}
+.cta{display:flex;align-items:center;gap:12px;width:100%;background:var(--or);color:#fff;border:0;border-radius:14px;padding:14px;text-align:left;cursor:pointer;box-shadow:0 4px 12px #ee5a0044}
+.cta small{color:#ffe6d6}.plus{width:38px;height:38px;border:2px solid #fff;border-radius:10px;display:grid;place-items:center;font-size:22px}
+.card{display:flex;align-items:center;gap:12px;width:100%;background:#fff;border:1px solid var(--ln);border-radius:14px;padding:12px;margin-bottom:9px;text-align:left;cursor:pointer}
+.card b{display:block}
+.ic{width:42px;height:42px;border-radius:50%;background:var(--orS);display:grid;place-items:center;font-size:19px;flex:none}
+.sum{display:grid;grid-template-columns:1fr 1fr;text-align:center;cursor:default}.sum b{font-size:22px}
+.tabs{display:flex;border-top:1px solid var(--ln);background:#fff;padding:6px 0 14px}
+.tabs button{flex:1;border:0;background:none;font-size:11px;color:#555;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer}
+.tabs button span{font-size:19px}.tabs .on{color:var(--or);font-weight:700}
+.btn{display:block;width:100%;background:var(--or);color:#fff;border:0;border-radius:12px;padding:12px;font-weight:600;cursor:pointer}
+.btn.g{background:#eee;color:#333}.btn:disabled{opacity:.4;cursor:default}
+.row{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--ln);font-size:14px}
+.step{display:flex;align-items:center;gap:8px}
+.step button{width:28px;height:28px;border-radius:50%;border:1px solid var(--or);background:#fff;color:var(--or);font-size:17px;line-height:1;cursor:pointer}
+.step button:disabled{opacity:.3}
+.badge{font-size:11px;padding:2px 8px;border-radius:99px;background:var(--orS);color:var(--or);white-space:nowrap}
+.badge.ok{background:#e3f6e4;color:#217a25}.badge.lo{background:#fde4e2;color:#c0281d}
+.stk{position:sticky;bottom:0;background:#fafafa;padding-top:8px}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:#fff;border-radius:22px 22px 0 0;padding:16px;box-shadow:0 -8px 30px #0003;z-index:5}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0}
+.toast{position:absolute;left:12px;right:12px;top:50px;background:#111;color:#fff;border-radius:12px;padding:10px 12px;font-size:12px;z-index:6;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.on{opacity:1}
+/* painel dos funcionários */
+.c0{--k:#8a93a3}.c1{--k:#4cc04f}.c2{--k:#f5a300}.c3{--k:#ff3b30}.c4{--k:#3b9eff}.c4 .chip{animation:pl 1s infinite;white-space:nowrap}@keyframes pl{50%{opacity:.4}}
+.hd{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;font-size:13px}
+.hd .clk{font-size:22px;font-weight:700;margin-left:auto}
+.lgs{display:flex;gap:10px;font-size:12px}.lgs span{color:var(--k)}
+.hd select{background:#18181b;color:#fff;border:1px solid #333;border-radius:6px;padding:2px 4px}
+.cols{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@container (max-width:560px){.cols{grid-template-columns:1fr}.sec{min-height:380px}}
+.sec{display:flex;flex-direction:column;min-height:0;background:#0d0d0f;border:1px solid #1d1d21;border-radius:12px;padding:10px}
+.sec h3{margin:0 0 8px;font-size:15px;letter-spacing:.04em}
+.list{flex:1;min-height:0;overflow:auto}
+.mz{display:flex;gap:10px;border:1px solid #232328;border-left:4px solid var(--k);border-radius:10px;padding:8px;margin-bottom:8px;background:#111113}
+.mn{width:122px;flex:none}.mn b{display:block;font-size:15px}.mn small{color:#9a9aa2}.fl{display:block;margin-top:8px;padding-top:6px;border-top:1px solid #26262b;font-size:10px;line-height:1.3;color:#9a9aa2}.fl b{font-size:17px;color:var(--k)}
+.its{flex:1;min-width:0}
+.it{display:flex;align-items:center;gap:6px;padding:5px 4px;border-radius:8px;cursor:pointer}
+.it+.it{border-top:1px solid #1f1f23}.it:hover{background:#1a1a1e}
+.it>div{flex:1;min-width:0;font-size:13px}.it small{display:block;color:#8d8d95;font-size:11px}
+.tm{font-size:18px;font-weight:700;color:var(--k);white-space:nowrap}.tm small{display:inline;color:var(--k);font-size:11px;font-weight:400}
+.chip{font-style:normal;font-size:10px;font-weight:700;padding:3px 7px;border-radius:6px;color:var(--k);background:color-mix(in srgb,var(--k) 18%,transparent);border:1px solid color-mix(in srgb,var(--k) 35%,transparent);min-width:74px;text-align:center}
+.note{font-size:11px;color:#9a9aa2;background:#121316;border-radius:8px;padding:7px 9px;margin:6px 0}
+.stats{display:flex;text-align:center;font-size:10px;color:#cfcfd4}
+.stats div{flex:1}.stats b{display:block;font-size:22px;color:#fff}.stats .r b,.stats .r{color:var(--r,#ff3b30)}
+.vz{color:#777;text-align:center;padding:30px 0;font-size:13px}.fin{background:#1f7a2b;color:#fff;border:0;border-radius:6px;padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap}.mn .fin{display:block;width:100%;margin-top:8px;padding:6px}.fin.go{animation:pl 1s infinite;min-width:96px}
+</style>
+</head>
+<body>
+<div class="split">
+ <section class="L"><div class="phone"><div class="scr"><div class="notch"></div><div id="app"></div><div class="toast" id="ts"></div></div></div></section>
+ <section class="R">
+  <header class="hd"><b>Painel da equipe · O’Belisco</b>
+   <span class="lgs"><span class="c0">● Aguarde</span><span class="c4">● Iniciar</span><span class="c1">● No tempo</span><span class="c2">● Atenção</span><span class="c3">● Prioridade</span></span>
+   <label>Demo <select id="sp"><option value="1">1×</option><option value="10" selected>10×</option><option value="30">30×</option></select></label>
+   <span class="clk"><small style="font-size:11px;font-weight:400;color:#9a9aa2;display:block;text-align:right">Horário de Brasília</small><span id="clk"></span></span></header>
+  <div class="cols" id="cols">
+   <div class="sec"><h3>🍳 COZINHA</h3><div class="list" id="lc"></div><div class="note">🕒 Entrega sincronizada = todos os itens prontos juntos</div><div class="stats" id="sc"></div></div>
+   <div class="sec"><h3>🍸 BAR</h3><div class="list" id="lb"></div><div class="note">🕒 Entrega sincronizada = todos os itens prontos juntos</div><div class="stats" id="sb2"></div></div>
+  </div>
+ </section>
+</div>
+<script>
+const $=s=>document.querySelector(s),pad=n=>String(n).padStart(2,'0');
+const M=[['Parmegiana de Frango','c',25,20],['Frango Grelhado','c',18,25],['Strogonoff','c',22,20],['Lasanha','c',30,15],['Coxinha artesanal','c',12,40],['Arroz Branco','c',20,40],['Batata Frita','c',10,30],['Pão de Alho','c',8,30],
+['Caipirinha','b',7,40],['Suco de Laranja','b',5,30],['Suco de Abacaxi','b',5,30],['Suco de Uva','b',5,30],['Refrigerante','b',2,60],['Água com Gás','b',2,40]].map(([n,s,p,e],i)=>({i,n,s,p,e0:e,e}));
+const LB=['AGUARDE','NO TEMPO','ATENÇÃO','PRIORIDADE','INICIAR AGORA'],base=new Date();
+let now,orders,tab,cur,cart,sheet,askDel,speed=10;
+const BR=new Intl.DateTimeFormat('pt-BR',{timeZone:'America/Sao_Paulo',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'});
+const T=m=>BR.format(new Date(base.getTime()+m*6e4));
+const tot=o=>o.lots.reduce((a,l)=>a+l.items.reduce((b,i)=>b+i.q,0),0);
+const pend=o=>o.lots.reduce((a,l)=>a+l.items.filter(i=>!i.done).reduce((b,i)=>b+i.q,0),0);
+const falta=(o,s)=>Math.ceil(fx(o,s));
+const fx=(o,s)=>{let m=0;o.lots.forEach(l=>{if(l.items.some(i=>!i.done&&(!s||M[i.m].s==s)))m=Math.max(m,l.dl==null?l.mx:l.dl-now)});return Math.max(0,m)};
+const ini=(o,s)=>o.lots.filter(l=>l.items.some(i=>!i.done&&(!s||M[i.m].s==s))).every(l=>l.dl!=null);
+const GR=1,RE=1,mmss=m=>{const t=Math.round(m*60);return pad(Math.floor(t/60))+':'+pad(t%60)};
+const atr=(o,s)=>o.lots.reduce((a,l)=>l.dl!=null&&l.items.some(i=>!i.done&&(!s||M[i.m].s==s))?Math.max(a,l.dl-(l.dl0??l.dl)):a,0);
+function adj(){orders.forEach(o=>o.lots.forEach(l=>{if(l.dl==null)return;if(l.dl0==null)l.dl0=l.dl;l.items.forEach(it=>{if(it.done)return;const p=M[it.m].p;if(!it.go){const sa=l.dl-p;if(it.sa0==null&&now>sa+GR)it.sa0=sa;if(it.sa0!=null)l.dl=Math.max(l.dl,now+p)}else if(now>l.dl){it.over=true;l.dl=now+RE}})}))}
+const sk=(it,l)=>l.dl==null?now+l.mx-M[it.m].p:l.dl-M[it.m].p;
+const lider=(o,s)=>{let b=null;o.lots.forEach(l=>{if(l.items.some(i=>!i.done&&(!s||M[i.m].s==s))&&(!b||(l.dl==null?l.mx:l.dl-now)>(b.dl==null?b.mx:b.dl-now)))b=l});return b?M[b.items.reduce((a,i)=>M[i.m].p>M[a.m].p?i:a).m].n:''};
+const st=(it,l)=>{if(l.dl==null)return M[it.m].p>=l.mx?4:0;const r=l.dl-now;if(now<l.dl-M[it.m].p)return 0;if(!it.go)return 4;if(it.over)return 3;if(it.sa0==null)return 1;return r<=3?3:2};
+function addLots(o,I){(o.sync?[I]:['c','b'].map(s=>I.filter(x=>M[x.m].s==s))).forEach(g=>{if(!g.length)return;const mx=Math.max(...g.map(x=>M[x.m].p));o.lots.push({mx,dl:null,items:g.map(x=>({...x,done:false,go:false}))})})}
+function init(){now=0;orders=[];tab='ped';cur=null;cart={};sheet=0;M.forEach(m=>m.e=m.e0);
+ const S=(mesa,op,_,L)=>{let o=orders.find(x=>x.mesa==mesa);if(!o)orders.push(o={mesa,op,sync:!!_,lots:[]});addLots(o,L.map(([n,q=1])=>({m:M.findIndex(x=>x.n==n),q})))};
+ S(5,-6,1,[['Parmegiana de Frango'],['Arroz Branco'],['Batata Frita'],['Caipirinha'],['Suco de Laranja'],['Refrigerante']]);
+ S(6,-4,0,[['Frango Grelhado'],['Arroz Branco'],['Suco de Abacaxi'],['Água com Gás']]);
+ S(7,-3,1,[['Strogonoff'],['Arroz Branco'],['Batata Frita'],['Caipirinha'],['Refrigerante'],['Suco de Uva']]);
+ S(8,-1,0,[['Lasanha'],['Pão de Alho'],['Suco de Laranja'],['Caipirinha']])}
+function toast(t){const e=$('#ts');e.textContent=t;e.classList.add('on');clearTimeout(toast.h);toast.h=setTimeout(()=>e.classList.remove('on'),2800)}
+function send(){const L=Object.entries(cart).filter(([,q])=>q>0).map(([m,q])=>({m:+m,q}));if(!L.length)return;
+ const p=Math.max(...L.map(x=>M[x.m].p)),o=orders.find(x=>x.mesa==cur);addLots(o,L);L.forEach(x=>M[x.m].e-=x.q);cart={};
+ toast(o.sync?'Pedido enviado: pratos e bebidas saem juntos':'Pedido enviado: cozinha e bar separados')}
+function app(){
+ const sc=$('.body')?$('.body').scrollTop:0,o=cur&&orders.find(x=>x.mesa==cur);let h='',t='Pedidos';
+ if(tab=='ped'&&!o){
+  h=`<button class="cta" data-a="new"><span class="plus">＋</span><span class="grow"><b>Nova comanda / mesa</b><br><small>Adicionar uma nova comanda</small></span>›</button><h2>Comandas abertas</h2>`+
+  (orders.map(x=>{const p=pend(x),n=tot(x);return `<button class="card" data-a="open" data-v="${x.mesa}"><span class="ic">🍽</span><span class="grow"><b>Mesa ${pad(x.mesa)}</b><small>Aberta às ${T(x.op)}</small></span>${n&&!p?'<span class="badge ok">Pronta</span>':`<small style="text-align:right">${n} ${n==1?'item':'itens'}${p?'<br>pronta em '+falta(x)+' min':''}</small>`}<span>›</span></button>`}).join('')||'<p class="mut">Nenhuma comanda aberta.</p>')+
+  `<h2>Resumo do dia</h2><div class="card sum"><div>📋<b>${orders.length}</b><small>Comandas abertas</small></div><div>🕒<b>${orders.reduce((a,x)=>a+pend(x),0)}</b><small>Em preparo</small></div></div>`;
+ }else if(tab=='ped'){
+  t='Mesa '+pad(o.mesa);
+  const lines=o.lots.flatMap(l=>l.items.map(i=>`<div class="row"><span class="grow">${i.q}× ${M[i.m].n}</span><span class="badge ${i.done?'ok':''}">${i.done?'Pronto':'Em preparo'}</span></div>`)).join('')||'<p class="mut">Nenhum item enviado ainda.</p>';
+  const menu=['x'].map(s=>`<h2>Cardápio · cozinha + bar</h2><p class="mut" style="font-size:12px;margin:0">${o.sync?'Pratos e bebidas saem juntos: o item mais demorado define o tempo da comanda.':'Cozinha e bar separados: cada setor conta o seu próprio tempo.'}</p>`+M.map(m=>`<div class="row"><span class="grow">${m.s=='c'?'🍳':'🍸'} ${m.n}<br><small>${m.p} min · estoque ${m.e}</small></span><span class="step"><button data-a="sub" data-v="${m.i}">−</button><b>${cart[m.i]||0}</b><button data-a="add" data-v="${m.i}" ${(cart[m.i]||0)>=m.e?'disabled':''}>＋</button></span></div>`).join('')).join('');
+  const n=Object.values(cart).reduce((a,b)=>a+b,0);
+  h=`<button class="btn g" data-a="back">‹ Voltar às comandas</button><button class="card" data-a="sync" style="margin:10px 0 0"><span class="ic">🍽</span><span class="grow"><b>Cozinha / Bar</b><br><small>${o.sync?'Sincronizados: pratos e bebidas saem juntos':'Separados: cada setor com o seu tempo'}</small></span><span class="badge ${o.sync?'ok':''}">${o.sync?'Ativado':'Desativado'}</span></button><h2>Já enviados</h2>${pend(o)?`<div class="badge" style="display:inline-block;margin-bottom:6px">Comanda pronta em ${falta(o)} min · às ${ini(o)?T(now+fx(o)):'--:--'}${atr(o)>.01?' · atraso +'+mmss(atr(o)):''}</div>`:''}${lines}${menu}<div class="stk"><button class="btn" data-a="send" ${n?'':'disabled'}>Enviar pedido (${n} ${n==1?'item':'itens'})</button>${tot(o)&&!pend(o)?'<button class="btn g" style="margin-top:6px" data-a="close">Fechar comanda</button>':''}${askDel==o.mesa?'<button class="btn" style="margin-top:6px;background:#d92d20" data-a="del">Confirmar: excluir Mesa '+pad(o.mesa)+'</button><button class="btn g" style="margin-top:6px" data-a="nodel">Cancelar</button>':'<button class="btn g" style="margin-top:6px;color:#d92d20" data-a="del">🗑 Excluir comanda</button>'}</div>`;
+ }else if(tab=='card'){t='Cardápio';h=['c','b'].map(s=>`<h2>${s=='c'?'Pratos':'Bebidas'}</h2>`+M.filter(m=>m.s==s).map(m=>`<div class="row"><span class="grow">${m.n}</span><small>${m.p} min</small></div>`).join('')).join('')}
+ else if(tab=='est'){t='Estoque';h='<h2>Itens em estoque</h2>'+M.map(m=>`<div class="row"><span class="grow">${m.n}</span><span class="badge ${m.e<10?'lo':'ok'}">${m.e} un.</span></div>`).join('')}
+ else{t='Mais';h='<h2>Sobre</h2><p class="mut" style="font-size:13px">Protótipo do TCC: o app do garçom envia os itens e o painel da equipe sincroniza a entrega pelo maior tempo de preparo.</p><button class="btn" data-a="reset">Reiniciar demonstração</button>'}
+ const tb=[['ped','🛎','Pedidos'],['card','🍴','Cardápio'],['est','📦','Estoque'],['mais','⋯','Mais']].map(([k,i,n])=>`<button data-a="tab" data-v="${k}" class="${tab==k?'on':''}"><span>${i}</span>${n}</button>`).join('');
+ const free=[1,2,3,4,5,6,7,8,9,10,11,12].filter(n=>!orders.some(x=>x.mesa==n));
+ $('#app').innerHTML=`<div class="sb"><span id="sbt">${T(now)}</span><span>▂▄▆ 5G ▭</span></div><div class="top"><span>☰</span><h1>${t}</h1><span class="bell">🔔<i></i></span></div><div class="body">${h}</div><nav class="tabs">${tb}</nav>`+
+  (sheet?`<div class="sheet"><b>Escolha a mesa</b><div class="grid">${free.map(n=>`<button class="btn g" data-a="pick" data-v="${n}">${pad(n)}</button>`).join('')}</div><button class="btn g" data-a="x">Cancelar</button></div>`:'');
+ $('.body').scrollTop=sc}
+function sec(s){let h='',mesas=0,prep=0,pri=0;
+ orders.forEach(o=>{const rows=[];o.lots.forEach((l,li)=>l.items.forEach((it,ii)=>{if(M[it.m].s==s&&!it.done)rows.push([it,l,li,ii])}));
+  if(!rows.length)return;mesas++;rows.sort((a,b)=>sk(a[0],a[1])-sk(b[0],b[1]));let w=1,q=0;
+  const rh=rows.map(([it,l,li,ii])=>{const k=st(it,l),cl=k==4&&it.sa0!=null?(now-it.sa0>=3?3:2):k,sa=l.dl-M[it.m].p;w=Math.max(w,cl==4?2:cl);q+=it.q;prep+=it.q;if(cl==3)pri+=it.q;
+   return `<div class="it c${cl}" data-o="${o.mesa}" data-l="${li}" data-i="${ii}" title="${k==4?'Clique para iniciar o preparo':k==0?'Aguarde o momento de iniciar':'Concluir quando faltar 1 min'}"><div><b>${it.q>1?it.q+'× ':''}${M[it.m].n}</b><small>${M[it.m].p} min · ${k==0?(l.dl==null?'aguardando início da comanda':'iniciar em '+Math.ceil(sa-now)+' min'):k==4?(it.sa0!=null?'atrasado +'+mmss(now-it.sa0)+' · '+(cl==3?'PRIORIDADE':'ATENÇÃO'):'iniciar agora'):it.over?'atrasado · concluir quando pronto':'em preparo'}</small></div><span class="tm">${pad(Math.max(0,Math.ceil(l.dl==null?l.mx:l.dl-now)))} <small>min</small></span>${k==4?'<button class="fin go" style="background:var(--k)">INICIAR AGORA</button>':it.go&&l.dl!=null&&l.dl-now<=1?'<button class="fin">✓ Concluído</button>':`<i class="chip">${it.over?'ATRASADO':LB[k]}</i>`}</div>`}).join('');
+  h+=`<div class="mz c${w}"><div class="mn"><b>Mesa ${pad(o.mesa)}</b><small>${q} ${q>1?'itens':'item'}</small>${o.sync?'<small style="display:block;color:#7fb4ff">cozinha + bar juntos</small>':''}<span class="fl">Comanda ${s=='c'?'da cozinha':'do bar'} pronta em<b>${pad(falta(o,s))} min</b>às ${ini(o,s)?T(now+fx(o,s)):'--:--'}<i style="display:block;font-style:normal;margin-top:3px">tempo definido por ${lider(o,s)}</i>${atr(o,s)>.01?'<i style="display:block;font-style:normal;margin-top:4px;color:#ff6b5e;font-weight:700">⚠ atraso +'+mmss(atr(o,s))+' · entrega estimada '+T(now+fx(o,s))+'</i>':''}</span>${rows.length>1&&rows.every(([it,l])=>it.go&&l.dl!=null&&l.dl-now<=1)?`<button class="fin" data-fin="${o.mesa}" data-s="${s}">✓ Concluir comanda</button>`:''}</div><div class="its">${rh}</div></div>`});
+ return{h:h||'<div class="vz">Nenhum pedido em preparo</div>',mesas,prep,pri}}
+function staff(){let hot=0;
+ [['c','lc','sc','PRATOS'],['b','lb','sb2','BEBIDAS']].forEach(([s,l,st2,nm])=>{const r=sec(s);hot+=r.pri;
+  if($('#'+l).dataset.h!==r.h){$('#'+l).innerHTML=r.h;$('#'+l).dataset.h=r.h}
+  $('#'+st2).innerHTML=`<div><b>${pad(r.mesas)}</b>MESAS ATIVAS</div><div><b>${pad(r.prep)}</b>${nm} EM PREPARO</div><div class="r"><b>${pad(r.pri)}</b>ITENS EM PRIORIDADE</div>`});
+ document.body.classList.toggle('hot',hot>0);$('#clk').textContent=T(now);const e=$('#sbt');if(e)e.textContent=T(now)}
+$('#app').onclick=e=>{const b=e.target.closest('[data-a]');if(!b||b.disabled)return;const a=b.dataset.a,v=+b.dataset.v;
+ if(a!='del')askDel=0;if(a=='tab'){tab=b.dataset.v;cur=null;cart={}}else if(a=='new')sheet=1;else if(a=='x')sheet=0;
+ else if(a=='pick'){orders.push({mesa:v,op:now,sync:false,lots:[]});orders.sort((x,y)=>x.mesa-y.mesa);cur=v;cart={};sheet=0}
+ else if(a=='open'){cur=v;cart={}}else if(a=='back'){cur=null;cart={}}
+ else if(a=='add')cart[v]=(cart[v]||0)+1;else if(a=='sub')cart[v]=Math.max(0,(cart[v]||0)-1);
+ else if(a=='send')send();else if(a=='close'){orders=orders.filter(x=>x.mesa!=cur);cur=null;cart={}}
+ else if(a=='del'){if(askDel==cur){orders=orders.filter(x=>x.mesa!=cur);cur=null;cart={};askDel=0;toast('Comanda excluída')}else askDel=cur}else if(a=='nodel')askDel=0;else if(a=='sync'){const q=orders.find(x=>x.mesa==cur);q.sync=!q.sync}
+ else if(a=='reset')init();
+ app();staff()};
+$('#cols').onclick=e=>{const f=e.target.closest('[data-fin]');if(f){const o=orders.find(x=>x.mesa==f.dataset.fin);o.lots.forEach(l=>{if(l.dl!=null&&l.dl-now<=1)l.items.forEach(i=>{if(i.go&&M[i.m].s==f.dataset.s)i.done=true})});toast(`Mesa ${pad(o.mesa)}: ${f.dataset.s=='c'?'cozinha':'bar'} concluído`);staff();app();return}const r=e.target.closest('.it');if(!r)return;const d=r.dataset,l=orders.find(x=>x.mesa==d.o).lots[d.l],it=l.items[d.i],k=st(it,l);if(k==0)return;if(k==4){it.go=true;if(l.dl==null)l.dl=now+l.mx;staff();app();return}
+ if(l.dl-now>1)return;it.done=true;toast(`Mesa ${pad(d.o)}: ${M[it.m].n} pronto — retirar`);staff();app()};
+$('#sp').onchange=e=>speed=+e.target.value;
+let lg='';
+setInterval(()=>{now+=speed*.5/60;adj();staff();const g=orders.map(o=>falta(o)+':'+Math.floor(atr(o))).join();if(g!==lg){lg=g;app()}},500);
+init();app();staff();
+</script>
+</body>
+</html>
